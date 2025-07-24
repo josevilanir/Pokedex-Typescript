@@ -8,35 +8,70 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Pokemon-inspired design system */
+    --background: 225 100% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Pokemon Red */
+    --primary: 348 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 348 100% 65%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Pokemon Blue */
+    --secondary: 217 100% 55%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 225 15% 95%;
+    --muted-foreground: 215 15% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Pokemon Yellow */
+    --accent: 48 100% 55%;
+    --accent-foreground: 215 25% 15%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 225 15% 88%;
+    --input: 225 15% 92%;
+    --ring: 348 100% 55%;
 
-    --radius: 0.5rem;
+    /* Pokemon type colors */
+    --fire: 14 100% 55%;
+    --water: 217 100% 55%;
+    --grass: 122 55% 45%;
+    --electric: 48 100% 55%;
+    --psychic: 300 55% 65%;
+    --ice: 195 100% 75%;
+    --dragon: 248 100% 55%;
+    --dark: 240 15% 25%;
+    --fairy: 320 75% 75%;
+    --fighting: 14 85% 45%;
+    --poison: 285 75% 55%;
+    --ground: 40 75% 45%;
+    --flying: 217 75% 75%;
+    --bug: 75 75% 45%;
+    --rock: 40 35% 45%;
+    --ghost: 248 35% 45%;
+    --steel: 240 15% 65%;
+    --normal: 40 15% 75%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--accent)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+
+    /* Shadows */
+    --shadow-pokemon: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.1);
+    --shadow-glow: 0 0 30px hsl(var(--primary-glow) / 0.4);
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 

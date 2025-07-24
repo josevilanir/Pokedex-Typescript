@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -51,6 +52,27 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				// Pokemon type colors
+				pokemon: {
+					fire: 'hsl(var(--fire))',
+					water: 'hsl(var(--water))',
+					grass: 'hsl(var(--grass))',
+					electric: 'hsl(var(--electric))',
+					psychic: 'hsl(var(--psychic))',
+					ice: 'hsl(var(--ice))',
+					dragon: 'hsl(var(--dragon))',
+					dark: 'hsl(var(--dark))',
+					fairy: 'hsl(var(--fairy))',
+					fighting: 'hsl(var(--fighting))',
+					poison: 'hsl(var(--poison))',
+					ground: 'hsl(var(--ground))',
+					flying: 'hsl(var(--flying))',
+					bug: 'hsl(var(--bug))',
+					rock: 'hsl(var(--rock))',
+					ghost: 'hsl(var(--ghost))',
+					steel: 'hsl(var(--steel))',
+					normal: 'hsl(var(--normal))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -84,11 +106,42 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pokemon-bounce': {
+					'0%, 100%': {
+						transform: 'translateY(0px)',
+						animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)'
+					},
+					'50%': {
+						transform: 'translateY(-5px)',
+						animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)'
+					}
+				},
+				'pokeball-spin': {
+					'0%': {
+						transform: 'rotate(0deg)'
+					},
+					'100%': {
+						transform: 'rotate(360deg)'
+					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pokemon-bounce': 'pokemon-bounce 2s infinite',
+				'pokeball-spin': 'pokeball-spin 2s linear infinite',
+				'fade-in': 'fade-in 0.5s ease-out'
 			}
 		}
 	},

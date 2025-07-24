@@ -1,4 +1,25 @@
-# Welcome to your Lovable project
+# Pokédx Explorer 🔴⚡🔵
+
+Uma Pokédx moderna e responsiva construída com TypeScript, React e a API oficial do Pokémon.
+
+## ✨ Características
+
+- 🎨 **Design moderno** inspirado nas cores clássicas do Pokémon
+- 📱 **Totalmente responsivo** para todos os dispositivos
+- 🔍 **Busca inteligente** por nome ou número
+- 📊 **Estatísticas detalhadas** de cada Pokémon
+- 🧬 **Cadeias evolutivas** interativas
+- ⚡ **Carregamento otimizado** com paginação infinita
+- 🎯 **Interface intuitiva** com modais de detalhes
+
+## 🛠️ Tecnologias
+
+- **React 18** com TypeScript
+- **TanStack Query** para gerenciamento de estado e cache
+- **Tailwind CSS** com sistema de design customizado
+- **Shadcn/ui** para componentes base
+- **PokeAPI** como fonte de dados
+- **Radix UI** para componentes acessíveis
 
 ## Project info
 

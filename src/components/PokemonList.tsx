@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PokemonCard } from './PokemonCard';
 import { PokemonDetails } from './PokemonDetails';
+import { PokemonTypeFilter } from './PokemonTypeFilter';
 import { usePokemonList } from '@/hooks/usePokemon';
 import { pokemonApi } from '@/services/pokemonApi';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Pokemon } from '@/types/pokemon';
 export function PokemonList() {
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('all');
   const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
   const pokemonDataRef = useRef<Pokemon[]>([]);
 
@@ -48,11 +50,16 @@ export function PokemonList() {
     }
   }, [data?.pages?.length]);
 
-  // Filtrar pokémon por busca
-  const filteredPokemon = pokemonData.filter(pokemon =>
-    pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pokemon.id.toString().includes(searchTerm)
-  );
+  // Filtrar pokémon por busca e tipo
+  const filteredPokemon = pokemonData.filter(pokemon => {
+    const matchesSearch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pokemon.id.toString().includes(searchTerm);
+    
+    const matchesType = selectedType === 'all' || 
+      pokemon.types.some(type => type.type.name === selectedType);
+    
+    return matchesSearch && matchesType;
+  });
 
   const handlePokemonClick = (pokemonName: string) => {
     setSelectedPokemon(pokemonName);
@@ -74,14 +81,20 @@ export function PokemonList() {
   return (
     <div className="container mx-auto px-4 py-8">
 
-      {/* Search */}
-      <div className="relative max-w-md mx-auto mb-8">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-        <Input
-          placeholder="Search Pokémon by name or number..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Input
+            placeholder="Search Pokémon by name or number..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <PokemonTypeFilter
+          selectedType={selectedType}
+          onTypeChange={setSelectedType}
         />
       </div>
 
@@ -110,7 +123,7 @@ export function PokemonList() {
           </div>
 
           {/* Botão carregar mais */}
-          {hasNextPage && !searchTerm && (
+          {hasNextPage && !searchTerm && selectedType === 'all' && (
             <div className="text-center">
               <Button
                 onClick={() => fetchNextPage()}
@@ -131,10 +144,10 @@ export function PokemonList() {
           )}
 
           {/* Mensagem quando nenhum pokémon é encontrado */}
-          {searchTerm && filteredPokemon.length === 0 && (
+          {(searchTerm || selectedType !== 'all') && filteredPokemon.length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">
-                No Pokémon found matching "{searchTerm}"
+                No Pokémon found matching your filters
               </p>
             </div>
           )}

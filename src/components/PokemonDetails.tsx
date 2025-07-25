@@ -6,6 +6,7 @@ import { PokemonTypeChip } from './PokemonTypeChip';
 import { PokemonStats } from './PokemonStats';
 import { PokemonEvolution } from './PokemonEvolution';
 import { usePokemonDetails } from '@/hooks/usePokemon';
+import { getPokemonTypeTheme } from '@/lib/pokemonTheme';
 import { Loader2, Weight, Ruler, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PokemonDetailsProps {
@@ -49,16 +50,19 @@ export function PokemonDetails({
     );
   }
 
+  const primaryType = pokemon?.types[0]?.type.name || 'normal';
+  const theme = getPokemonTypeTheme(primaryType);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`max-w-4xl max-h-[90vh] overflow-y-auto ${theme.background}`}>
         {isLoading || !pokemon ? (
           <div className="flex items-center justify-center p-8">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : (
           <>
-            <DialogHeader>
+              <DialogHeader>
               <DialogTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl font-bold capitalize">{pokemon.name}</span>
@@ -96,7 +100,7 @@ export function PokemonDetails({
               {/* Coluna esquerda - Imagem do Pokémon */}
               <div className="lg:col-span-1 flex justify-center">
                 <div className="relative">
-                  <div className="w-64 h-64 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary/30 flex items-center justify-center">
+                  <div className={`w-64 h-64 rounded-full ${theme.imageBg} border-4 ${theme.imageBorder} flex items-center justify-center`}>
                     <img
                       src={pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}
                       alt={pokemon.name}
@@ -113,7 +117,7 @@ export function PokemonDetails({
               {/* Coluna central - Informações principais */}
               <div className="lg:col-span-1 space-y-4">
                 {/* Name Section */}
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <h3 className="text-lg font-bold text-foreground mb-2">Name</h3>
                   <div className="space-y-2">
                     <div className="flex flex-wrap gap-2">
@@ -127,7 +131,7 @@ export function PokemonDetails({
                 </div>
 
                 {/* Dex Entry */}
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <h3 className="text-lg font-bold text-foreground mb-2">Dex entry</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {description}
@@ -135,7 +139,7 @@ export function PokemonDetails({
                 </div>
 
                 {/* Size Comparison */}
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <h3 className="text-lg font-bold text-foreground mb-2">Size comp.</h3>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -153,7 +157,7 @@ export function PokemonDetails({
               {/* Coluna direita - Stats e Abilities */}
               <div className="lg:col-span-1 space-y-4">
                 {/* Ability */}
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <h3 className="text-lg font-bold text-foreground mb-2">Ability</h3>
                   <div className="space-y-2">
                     {pokemon.abilities.map((ability) => (
@@ -175,7 +179,7 @@ export function PokemonDetails({
                 </div>
 
                 {/* Stats */}
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <PokemonStats stats={pokemon.stats} />
                 </div>
               </div>
@@ -184,7 +188,7 @@ export function PokemonDetails({
             {/* Evolution Chain na parte inferior */}
             <div className="mt-8">
               {evolutionChain ? (
-                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                <div className={`${theme.cardBg} ${theme.border} rounded-lg p-4`}>
                   <h3 className="text-lg font-bold text-foreground mb-4">Evolution Chain</h3>
                   <PokemonEvolution 
                     evolutionChain={evolutionChain} 

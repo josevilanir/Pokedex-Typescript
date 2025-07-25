@@ -65,6 +65,29 @@ export function PokemonList() {
     setSelectedPokemon(pokemonName);
   };
 
+  // Funções de navegação
+  const getCurrentPokemonIndex = () => {
+    if (!selectedPokemon) return -1;
+    return pokemonData.findIndex(p => p.name === selectedPokemon);
+  };
+
+  const handleNavigatePrevious = () => {
+    const currentIndex = getCurrentPokemonIndex();
+    if (currentIndex > 0) {
+      setSelectedPokemon(pokemonData[currentIndex - 1].name);
+    }
+  };
+
+  const handleNavigateNext = () => {
+    const currentIndex = getCurrentPokemonIndex();
+    if (currentIndex < pokemonData.length - 1) {
+      setSelectedPokemon(pokemonData[currentIndex + 1].name);
+    }
+  };
+
+  const canNavigatePrevious = getCurrentPokemonIndex() > 0;
+  const canNavigateNext = getCurrentPokemonIndex() < pokemonData.length - 1;
+
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -156,12 +179,16 @@ export function PokemonList() {
 
       {/* Modal de detalhes */}
       {selectedPokemon && (
-        <PokemonDetails
-          pokemonName={selectedPokemon}
-          isOpen={!!selectedPokemon}
-          onClose={() => setSelectedPokemon(null)}
-          onPokemonClick={handlePokemonClick}
-        />
+      <PokemonDetails
+        pokemonName={selectedPokemon}
+        isOpen={!!selectedPokemon}
+        onClose={() => setSelectedPokemon(null)}
+        onPokemonClick={handlePokemonClick}
+        onNavigatePrevious={handleNavigatePrevious}
+        onNavigateNext={handleNavigateNext}
+        canNavigatePrevious={canNavigatePrevious}
+        canNavigateNext={canNavigateNext}
+      />
       )}
     </div>
   );

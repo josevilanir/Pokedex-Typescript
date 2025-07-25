@@ -1,24 +1,33 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { PokemonTypeChip } from './PokemonTypeChip';
 import { PokemonStats } from './PokemonStats';
 import { PokemonEvolution } from './PokemonEvolution';
 import { usePokemonDetails } from '@/hooks/usePokemon';
-import { Loader2, Weight, Ruler, Star } from 'lucide-react';
+import { Loader2, Weight, Ruler, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PokemonDetailsProps {
   pokemonName: string;
   isOpen: boolean;
   onClose: () => void;
   onPokemonClick?: (name: string) => void;
+  onNavigatePrevious?: () => void;
+  onNavigateNext?: () => void;
+  canNavigatePrevious?: boolean;
+  canNavigateNext?: boolean;
 }
 
 export function PokemonDetails({ 
   pokemonName, 
   isOpen, 
   onClose, 
-  onPokemonClick 
+  onPokemonClick,
+  onNavigatePrevious,
+  onNavigateNext,
+  canNavigatePrevious = false,
+  canNavigateNext = false
 }: PokemonDetailsProps) {
   const { pokemon, species, evolutionChain, isLoading, error } = usePokemonDetails(pokemonName);
 
@@ -50,11 +59,35 @@ export function PokemonDetails({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-3">
-                <span className="text-2xl font-bold capitalize">{pokemon.name}</span>
-                <Badge variant="outline" className="text-sm">
-                  #{pokemon.id.toString().padStart(3, '0')}
-                </Badge>
+              <DialogTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold capitalize">{pokemon.name}</span>
+                  <Badge variant="outline" className="text-sm">
+                    #{pokemon.id.toString().padStart(3, '0')}
+                  </Badge>
+                </div>
+                
+                {/* Navigation buttons */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onNavigatePrevious}
+                    disabled={!canNavigatePrevious}
+                    className="p-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onNavigateNext}
+                    disabled={!canNavigateNext}
+                    className="p-2"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </DialogTitle>
             </DialogHeader>
 

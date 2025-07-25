@@ -58,106 +58,111 @@ export function PokemonDetails({
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-6">
-              {/* Header com imagem e informações básicas */}
-              <div className="flex flex-col md:flex-row gap-6 items-center">
+            {/* Layout inspirado na imagem de referência */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Coluna esquerda - Imagem do Pokémon */}
+              <div className="lg:col-span-1 flex justify-center">
                 <div className="relative">
-                  <div className="w-48 h-48 rounded-full bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center">
+                  <div className="w-64 h-64 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary/30 flex items-center justify-center">
                     <img
                       src={pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}
                       alt={pokemon.name}
-                      className="w-40 h-40 object-contain"
+                      className="w-56 h-56 object-contain"
                     />
                   </div>
-                </div>
-
-                <div className="flex-1 space-y-4 text-center md:text-left">
-                  {/* Tipos */}
-                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                    {pokemon.types.map((type) => (
-                      <PokemonTypeChip key={type.type.name} type={type.type.name} />
-                    ))}
-                  </div>
-
-                  {/* Descrição */}
-                  <p className="text-muted-foreground leading-relaxed">
-                    {description}
-                  </p>
-
-                  {/* Informações físicas */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2 justify-center md:justify-start">
-                      <Ruler className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        <strong>Height:</strong> {(pokemon.height / 10).toFixed(1)}m
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 justify-center md:justify-start">
-                      <Weight className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        <strong>Weight:</strong> {(pokemon.weight / 10).toFixed(1)}kg
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Experiência base */}
-                  <div className="flex items-center gap-2 justify-center md:justify-start">
-                    <Star className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      <strong>Base Experience:</strong> {pokemon.base_experience}
-                    </span>
+                  {/* Pokeball pequena no canto */}
+                  <div className="absolute -bottom-2 -left-2 w-12 h-12 rounded-full bg-muted border-2 border-primary/50 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-primary/70"></div>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs com detalhes */}
-              <Tabs defaultValue="stats" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="stats">Stats</TabsTrigger>
-                  <TabsTrigger value="abilities">Abilities</TabsTrigger>
-                  <TabsTrigger value="evolution">Evolution</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="stats" className="mt-6">
-                  <PokemonStats stats={pokemon.stats} />
-                </TabsContent>
-
-                <TabsContent value="abilities" className="mt-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-foreground">Abilities</h3>
-                    <div className="grid gap-3">
-                      {pokemon.abilities.map((ability) => (
-                        <div 
-                          key={ability.ability.name}
-                          className="flex items-center justify-between p-3 bg-muted/20 rounded-lg"
-                        >
-                          <span className="font-medium capitalize text-foreground">
-                            {ability.ability.name.replace('-', ' ')}
-                          </span>
-                          {ability.is_hidden && (
-                            <Badge variant="secondary" className="text-xs">
-                              Hidden
-                            </Badge>
-                          )}
-                        </div>
+              {/* Coluna central - Informações principais */}
+              <div className="lg:col-span-1 space-y-4">
+                {/* Name Section */}
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Name</h3>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
+                      {pokemon.types.map((type, index) => (
+                        <span key={type.type.name} className="text-sm text-muted-foreground">
+                          Type {index + 1}: <PokemonTypeChip type={type.type.name} />
+                        </span>
                       ))}
                     </div>
                   </div>
-                </TabsContent>
+                </div>
 
-                <TabsContent value="evolution" className="mt-6">
-                  {evolutionChain ? (
-                    <PokemonEvolution 
-                      evolutionChain={evolutionChain} 
-                      onPokemonClick={onPokemonClick}
-                    />
-                  ) : (
-                    <div className="text-center text-muted-foreground py-8">
-                      <p>Evolution data not available</p>
+                {/* Dex Entry */}
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Dex entry</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {description}
+                  </p>
+                </div>
+
+                {/* Size Comparison */}
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Size comp.</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Ruler className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">HT: {(pokemon.height / 10).toFixed(1)}m</span>
                     </div>
-                  )}
-                </TabsContent>
-              </Tabs>
+                    <div className="flex items-center gap-2">
+                      <Weight className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">WT: {(pokemon.weight / 10).toFixed(1)}kg</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coluna direita - Stats e Abilities */}
+              <div className="lg:col-span-1 space-y-4">
+                {/* Ability */}
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Ability</h3>
+                  <div className="space-y-2">
+                    {pokemon.abilities.map((ability) => (
+                      <div 
+                        key={ability.ability.name}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-sm font-medium capitalize text-foreground">
+                          {ability.ability.name.replace('-', ' ')}
+                        </span>
+                        {ability.is_hidden && (
+                          <Badge variant="secondary" className="text-xs">
+                            Hidden
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <PokemonStats stats={pokemon.stats} />
+                </div>
+              </div>
+            </div>
+
+            {/* Evolution Chain na parte inferior */}
+            <div className="mt-8">
+              {evolutionChain ? (
+                <div className="bg-card border border-primary/20 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-4">Evolution Chain</h3>
+                  <PokemonEvolution 
+                    evolutionChain={evolutionChain} 
+                    onPokemonClick={onPokemonClick}
+                  />
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  <p>Evolution data not available</p>
+                </div>
+              )}
             </div>
           </>
         )}

@@ -9,7 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Search } from 'lucide-react';
 import { Pokemon } from '@/types/pokemon';
 
-export function PokemonList() {
+interface PokemonListProps {
+  generationFilter?: number;
+  startRange?: number;
+  endRange?: number;
+}
+
+export function PokemonList({ generationFilter, startRange, endRange }: PokemonListProps = {}) {
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
@@ -33,7 +39,15 @@ export function PokemonList() {
   // Buscar dados detalhados dos pokémon
   useEffect(() => {
     if (data?.pages) {
-      const allPokemon = data.pages.flatMap(page => page.results);
+      let allPokemon = data.pages.flatMap(page => page.results);
+      
+      // Filter by generation range if specified
+      if (startRange && endRange) {
+        allPokemon = allPokemon.filter(pokemon => {
+          const pokemonId = parseInt(pokemon.url.split('/').slice(-2, -1)[0]);
+          return pokemonId >= startRange && pokemonId <= endRange;
+        });
+      }
       
       // Só buscar pokémon que ainda não temos
       const newPokemon = allPokemon.filter(pokemon => 
@@ -48,7 +62,7 @@ export function PokemonList() {
         });
       }
     }
-  }, [data?.pages?.length]);
+  }, [data?.pages?.length, startRange, endRange]);
 
   // Filtrar pokémon por busca e tipo
   const filteredPokemon = pokemonData.filter(pokemon => {
@@ -145,8 +159,8 @@ export function PokemonList() {
             ))}
           </div>
 
-          {/* Botão carregar mais */}
-          {hasNextPage && !searchTerm && selectedType === 'all' && (
+          {/* Botão carregar mais - Only show if not filtering by generation */}
+          {hasNextPage && !searchTerm && selectedType === 'all' && !generationFilter && (
             <div className="text-center">
               <Button
                 onClick={() => fetchNextPage()}

@@ -64,8 +64,31 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
     }
   }, [data?.pages?.length, startRange, endRange]);
 
+  // Load all pokemon for a generation automatically
+  useEffect(() => {
+    if (generationFilter && startRange && endRange) {
+      // Calculate how many pages we need to load to get all pokemon
+      const totalPokemonNeeded = endRange - startRange + 1;
+      const currentPokemonCount = pokemonData.filter(p => 
+        p.id >= startRange && p.id <= endRange
+      ).length;
+      
+      // Keep fetching until we have all pokemon from the generation
+      if (currentPokemonCount < totalPokemonNeeded && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }
+  }, [generationFilter, startRange, endRange, pokemonData.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   // Filtrar pokémon por busca e tipo
   const filteredPokemon = pokemonData.filter(pokemon => {
+    // If filtering by generation, only show pokemon in that range
+    if (startRange && endRange) {
+      if (pokemon.id < startRange || pokemon.id > endRange) {
+        return false;
+      }
+    }
+    
     const matchesSearch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pokemon.id.toString().includes(searchTerm);
     

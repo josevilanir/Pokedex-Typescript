@@ -50,11 +50,13 @@ const PokedexPage = () => {
       </div>
       
       {/* Pokemon List */}
-      <PokemonList 
-        generationFilter={generation ? parseInt(generation) : undefined}
-        startRange={start ? parseInt(start) : undefined}
-        endRange={end ? parseInt(end) : undefined}
-      />
+      <div className="pb-8">
+        <PokemonList 
+          generationFilter={generation ? parseInt(generation) : undefined}
+          startRange={start ? parseInt(start) : undefined}
+          endRange={end ? parseInt(end) : undefined}
+        />
+      </div>
     </div>
   );
 };

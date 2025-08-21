@@ -142,20 +142,33 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
     <div className="container mx-auto px-4 py-8">
 
       {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8">
-        <div className="relative max-w-md">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8 p-4 bg-card/50 rounded-lg border">
+        <div className="relative max-w-md w-full sm:w-auto">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Search Pokémon by name or number..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 w-full"
           />
         </div>
         <PokemonTypeFilter
           selectedType={selectedType}
           onTypeChange={setSelectedType}
         />
+        {(searchTerm || selectedType !== 'all') && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedType('all');
+            }}
+            className="text-xs"
+          >
+            Clear Filters
+          </Button>
+        )}
       </div>
 
       {/* Loading inicial */}

@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { PokemonCard } from './PokemonCard';
 import { PokemonDetails } from './PokemonDetails';
 import { PokemonTypeFilter } from './PokemonTypeFilter';
 import { usePokemonList } from '@/hooks/usePokemon';
 import { pokemonApi } from '@/services/pokemonApi';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Pokemon } from '@/types/pokemon';
+import { usePokemonSearch } from '@/hooks/usePokemonSearch';
+import { PokemonSearch } from './PokemonSearch';
 
 interface PokemonListProps {
   generationFilter?: number;
@@ -17,11 +18,6 @@ interface PokemonListProps {
 
 export function PokemonList({ generationFilter, startRange, endRange }: PokemonListProps = {}) {
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
-
-  // ESTADO DA BUSCA
-  const [searchTerm, setSearchTerm] = useState('');
-
-  // (mantido) filtro por tipo
   const [selectedType, setSelectedType] = useState('all');
 
   const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
@@ -36,18 +32,19 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
     error,
   } = usePokemonList(20);
 
+  // —— sincroniza ref
   useEffect(() => {
     pokemonDataRef.current = pokemonData;
   }, [pokemonData]);
 
-  // Carrega detalhes dos pokémon conforme paginação
+  // —— busca detalhes conforme paginação
   useEffect(() => {
     if (data?.pages) {
       let allPokemon = data.pages.flatMap(page => page.results);
 
       if (startRange && endRange) {
         allPokemon = allPokemon.filter(pokemon => {
-          const pokemonId = parseInt(pokemon.url.split('/').slice(-2, -1)[0]);
+          const pokemonId = parseInt(pokemon.url.split('/').slice(-2, -1)[0], 10);
           return pokemonId >= startRange && pokemonId <= endRange;
         });
       }
@@ -63,51 +60,28 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
     }
   }, [data?.pages?.length, startRange, endRange]);
 
-  // Autocarregar todos de uma geração (quando aplicável)
+  // —— autoload para geração
   useEffect(() => {
     if (generationFilter && startRange && endRange) {
-      const totalPokemonNeeded = endRange - startRange + 1;
-      const currentPokemonCount = pokemonData.filter(
-        p => p.id >= startRange && p.id <= endRange
-      ).length;
+      const total = endRange - startRange + 1;
+      const current = pokemonData.filter(p => p.id >= startRange && p.id <= endRange).length;
 
-      if (currentPokemonCount < totalPokemonNeeded && hasNextPage && !isFetchingNextPage) {
+      if (current < total && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     }
   }, [generationFilter, startRange, endRange, pokemonData.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // LISTA BÁSICA (nome + id) DIRETO DA API PAGINADA — ideal para busca por nome/número
-  const basicList = useMemo(() => {
-    const results =
-      data?.pages?.flatMap(page =>
-        page.results.map((r: { name: string; url: string }) => ({
-          name: r.name,
-          id: parseInt(r.url.split('/').slice(-2, -1)[0]),
-        }))
-      ) ?? [];
+  // —— HOOK DE BUSCA (estado + resultados)
+  const { query, setQuery, clear, hasQuery, results } = usePokemonSearch({
+    pages: data?.pages,
+    startRange,
+    endRange,
+  });
 
-    // Respeita faixa (geração) se existir
-    return results.filter(item => {
-      if (startRange && endRange) {
-        return item.id >= startRange && item.id <= endRange;
-      }
-      return true;
-    });
-  }, [data?.pages, startRange, endRange]);
-
-  // BUSCA: filtra apenas por nome OU número (id) e mostra SOMENTE nomes quando houver termo
-  const query = searchTerm.trim().toLowerCase();
-  const nameResults = useMemo(() => {
-    if (!query) return [];
-    return basicList
-      .filter(p => p.name.toLowerCase().includes(query) || p.id.toString().includes(query))
-      .sort((a, b) => a.id - b.id);
-  }, [basicList, query]);
-
-  // Filtro completo (quando não há termo de busca — mantém grid original + filtro por tipo)
+  // —— filtragem por tipo apenas quando NÃO há busca
   const filteredPokemon = useMemo(() => {
-    if (query) return []; // quando pesquisando, não exibimos grid de cards
+    if (hasQuery) return [];
     return pokemonData.filter(pokemon => {
       if (startRange && endRange) {
         if (pokemon.id < startRange || pokemon.id > endRange) return false;
@@ -117,9 +91,9 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
         pokemon.types.some(t => t.type.name === selectedType);
       return matchesType;
     });
-  }, [pokemonData, query, selectedType, startRange, endRange]);
+  }, [pokemonData, hasQuery, selectedType, startRange, endRange]);
 
-  // Navegação no modal
+  // —— navegação modal
   const handlePokemonClick = (pokemonName: string) => setSelectedPokemon(pokemonName);
 
   const getCurrentPokemonIndex = () =>
@@ -164,68 +138,25 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Barra de busca + filtro por tipo */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8 p-4 bg-card/50 rounded-lg border">
-        <div className="relative max-w-md w-full sm:w-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Buscar por nome ou número…"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full"
-            aria-label="Campo de busca de Pokémon"
-          />
-        </div>
+      {/* Busca (quando há termo, ela própria exibe a lista de nomes) */}
+      <PokemonSearch
+        query={query}
+        setQuery={setQuery}
+        clear={clear}
+        results={results}
+        onSelect={handlePokemonClick}
+      />
 
-        {/* Quando há busca, escondemos o filtro de tipo (foco: nomes) */}
-        {!query && (
-          <PokemonTypeFilter
-            selectedType={selectedType}
-            onTypeChange={setSelectedType}
-          />
-        )}
-
-        {(query || (!query && selectedType !== 'all')) && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setSearchTerm('');
-              setSelectedType('all');
-            }}
-          >
-            Limpar
-          </Button>
-        )}
-      </div>
-
-      {/* QUANDO HÁ TERMO: MOSTRAR APENAS A LISTA DE NOMES */}
-      {query && (
-        <div className="max-w-xl mx-auto">
-          {nameResults.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              Nenhum Pokémon encontrado para “{searchTerm}”.
-            </p>
-          ) : (
-            <ul className="divide-y rounded-md border overflow-hidden">
-              {nameResults.map(p => (
-                <li
-                  key={p.id}
-                  className="px-4 py-3 hover:bg-accent cursor-pointer flex items-center justify-between"
-                  onClick={() => handlePokemonClick(p.name)}
-                >
-                  <span className="capitalize">{p.name}</span>
-                  <span className="text-muted-foreground">#{p.id}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {/* SEM TERMO: GRID ORIGINAL DE CARDS */}
-      {!query && (
+      {/* Sem termo de busca: filtro por tipo + grid */}
+      {!hasQuery && (
         <>
+          <div className="flex items-center justify-center mb-6">
+            <PokemonTypeFilter
+              selectedType={selectedType}
+              onTypeChange={setSelectedType}
+            />
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredPokemon.map((pokemon) => (
               <PokemonCard
@@ -261,7 +192,7 @@ export function PokemonList({ generationFilter, startRange, endRange }: PokemonL
         </>
       )}
 
-      {/* Modal de detalhes (abre ao clicar num nome da lista ou num card) */}
+      {/* Modal de detalhes */}
       {selectedPokemon && (
         <PokemonDetails
           pokemonName={selectedPokemon}
